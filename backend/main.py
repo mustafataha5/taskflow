@@ -12,9 +12,13 @@ from sqlmodel import Session, select
 from database import create_db_and_tables, get_session
 from models import (
     Task, TaskCreate, TaskRead, TaskUpdate,
-    Priority, Category
+    Priority, Category, Status
 )
 
+
+# -----------------------------------
+# APPLICATION LIFESPAN
+# -----------------------------------
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -24,7 +28,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="TaskFlow API",
-    version="1.0.0",
+    version="1.1.0",
     lifespan=lifespan
 )
 
@@ -59,13 +63,12 @@ def get_tasks(
     page_size: Annotated[int, Query(ge=1, le=100)] = 10,
     priority: Priority | None = None,
     category: Category | None = None,
-    completed: bool | None = None,
+    task_status: Status | None = Query(default=None, alias="status"),
     sort_by: Literal[
         "created_at", "due_date"
     ] = "created_at",
     order: Literal["asc", "desc"] = "desc",
 ):
-
     statement = select(Task)
 
     # Filtering
@@ -79,9 +82,9 @@ def get_tasks(
             Task.category == category
         )
 
-    if completed is not None:
+    if task_status is not None:
         statement = statement.where(
-            Task.completed == completed
+            Task.status == task_status
         )
 
     # Sorting
@@ -166,7 +169,7 @@ def update_task(
     non_nullable = {
         "title",
         "description",
-        "completed",
+        "status",
         "priority",
         "category"
     }
@@ -184,7 +187,6 @@ def update_task(
         return task
 
     task.sqlmodel_update(updates)
-
     task.updated_at = datetime.now(timezone.utc)
 
     session.add(task)

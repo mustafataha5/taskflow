@@ -1,0 +1,13 @@
+<app-header class="sticky top-0 z-50 w-full shadow-sm" />
+
+<div class="flex min-h-screen bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100">
+  <!-- Sidebar -->
+  <app-sidebar class="w-64 flex-shrink-0 border-r border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-800 hidden md:block" />
+
+  <!-- Main Content Area -->
+  <main class="flex-1 p-6 md:p-8 overflow-y-auto">
+    <div class="max-w-7xl mx-auto">
+      <router-outlet />
+    </div>
+  </main>
+</div>
