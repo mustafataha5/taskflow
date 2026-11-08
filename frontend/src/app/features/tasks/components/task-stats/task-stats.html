@@ -1,1 +1,51 @@
-<p>task-stats works!</p>
+<div class="my-6 grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-5">
+  @for (stat of stats(); track stat.label) {
+    <div class="flex flex-col justify-between rounded-2xl border border-sky-100 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900"
+         [ngClass]="{ 'col-span-2 sm:col-span-1': stat.label === 'Archived' }">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">{{ stat.label }}</span>
+        
+        <!-- Icon Container with Dynamic Styling -->
+        <div class="flex h-8 w-8 items-center justify-center rounded-xl"
+             [ngClass]="{
+               'bg-sky-50 text-[#12c1b9] dark:bg-slate-800 dark:text-[#12c1b9]': stat.color === 'sky' && stat.label === 'Total Tasks',
+               'bg-sky-50 text-[#12c1b9] dark:bg-sky-950/50 dark:text-[#12c1b9]': stat.color === 'sky' && stat.label === 'In Progress',
+               'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300': stat.color === 'slate',
+               'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400': stat.color === 'emerald',
+               'bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400': stat.color === 'zinc'
+             }">
+          
+          <!-- Dynamic SVG Icons -->
+          @switch (stat.icon) {
+            @case ('list') {
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+            }
+            @case ('clock') {
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            }
+            @case ('zap') {
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            }
+            @case ('check') {
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            }
+            @case ('archive') {
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+              </svg>
+            }
+          }
+        </div>
+      </div>
+      <p class="mt-4 text-2xl font-bold text-slate-800 dark:text-white">{{ stat.value }}</p>
+    </div>
+  }
+</div>

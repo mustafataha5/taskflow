@@ -1,18 +1,28 @@
 
 export type TaskStatus =
-  'todo' | 'in_progress' | 'completed' | 'archived';
+  | 'todo'
+  | 'in_progress'
+  | 'completed'
+  | 'archived';
 
 export type TaskPriority =
-  'low' | 'medium' | 'high';
+  | 'low'
+  | 'medium'
+  | 'high';
 
 export type TaskCategory =
-  'work' | 'personal' | 'learning' |
-  'health' | 'finance' | 'other';
+  | 'work'
+  | 'personal'
+  | 'learning'
+  | 'health'
+  | 'finance'
+  | 'other';
 
+// Complete task returned by FastAPI
 export interface Task {
   id: number;
   title: string;
-  description: string | null;
+  description: string;
   status: TaskStatus;
   priority: TaskPriority;
   category: TaskCategory;
@@ -21,19 +31,29 @@ export interface Task {
   updated_at: string;
 }
 
-export type TaskCreate = Pick<
-  Task,
-  'title' | 'description' | 'priority' | 'category' | 'due_date'
-> & {
-  status?: TaskStatus;
-};
+// Data accepted by POST /tasks
+export type TaskCreate = Pick<Task, 'title'> &
+  Partial<
+    Pick<
+      Task,
+      | 'description'
+      | 'status'
+      | 'priority'
+      | 'category'
+      | 'due_date'
+    >
+  >;
 
+// Data accepted by PATCH /tasks/{id}
 export type TaskUpdate = Partial<TaskCreate>;
 
-export interface PaginatedTasks {
-  items: Task[];
-  total: number;
-  page: number;
-  page_size: number;
-  total_pages: number;
+// Query parameters for GET /tasks
+export interface TaskQueryParams {
+  page?: number;
+  page_size?: number;
+  priority?: TaskPriority;
+  category?: TaskCategory;
+  status?: TaskStatus;
+  sort_by?: 'created_at' | 'due_date';
+  order?: 'asc' | 'desc';
 }
