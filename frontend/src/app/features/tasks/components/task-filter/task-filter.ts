@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, input } from '@angular/core';
+import { Task } from '../../models/task.model';
 
 @Component({
   imports: [],
@@ -6,4 +7,7 @@ import { Component } from '@angular/core';
   styleUrl: './task-filter.css',
   templateUrl: './task-filter.html',
 })
-export class TaskFilter {}
+export class TaskFilter {
+
+  tasks = input.required<Task []>() ; 
+}
