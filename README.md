@@ -1,50 +1,59 @@
 # TaskFlow
 
-**TaskFlow** is a full-stack task management application built with FastAPI, SQLModel, SQLite, and Angular.
+**TaskFlow** is a full-stack task management application built with **FastAPI, SQLModel, SQLite, Angular, TypeScript, and Tailwind CSS**.
 
-The project is designed to demonstrate REST API development, database management, frontend integration, automated testing, and professional Git/GitHub workflows.
+It is a hands-on engineering project focused on building a maintainable REST API, practicing modern Angular architecture and reactive state management, writing automated tests, and following professional Git/GitHub workflows.
 
-**Project Status:** 🚧 V1 — In Development (Backend implemented, frontend planned)
+> **Project status:** 🚧 **V1 in development** — Backend CRUD and automated API tests are complete. The Angular UI, client-side task filtering, and responsive application shell are implemented using mock task data. Reactive forms and live API integration are next.
 
 ## Tech Stack
 
 | Layer | Technologies |
-|---|---|
+| --- | --- |
 | Backend | Python, FastAPI |
-| ORM | SQLModel (SQLAlchemy + Pydantic) |
-| Database | SQLite |
-| Frontend (Planned) | Angular, TypeScript, Tailwind CSS |
-| Testing | pytest, FastAPI TestClient, HTTPX |
-| Version Control | Git, GitHub |
+| ORM and validation | SQLModel, SQLAlchemy, Pydantic |
+| Database | SQLite (development) |
+| Frontend | Angular (standalone components), TypeScript, Tailwind CSS |
+| Frontend state | Angular Signals (`signal`, `computed`, `input`, `output`) |
+| API testing | pytest, FastAPI TestClient, HTTPX |
+| Version control | Git, GitHub, feature branches, pull requests |
 
-## Features
+## Current Features
 
 ### Backend — Implemented
 
-- Create, retrieve, update, and delete tasks
-- Task priority: Low, Medium, High
-- Task category: Work, Personal, Learning
-- Task completion tracking
-- Optional task due dates
-- Automatic creation and modification timestamps
-- Pagination for task listings
-- Filtering by priority, category, and completion status
-- Sorting by creation date or due date
-- Input validation with Pydantic
-- HTTP error handling
-- Health check endpoint
-- Automated API tests
+- REST endpoints to create, list, retrieve, partially update, and delete tasks
+- Task statuses: `todo`, `in_progress`, `completed`, `archived`
+- Task priorities: `low`, `medium`, `high`
+- Task categories: `work`, `personal`, `learning`, `health`, `finance`, `other`
+- Optional due dates and automatic creation/update timestamps
+- Pagination, filtering by status/priority/category, and sorting
+- Request validation and HTTP error handling
+- Health-check endpoint
+- Automated endpoint tests using an isolated test database
 
-### Frontend — Planned
+### Frontend — Implemented with Mock Data
 
-- Responsive Angular dashboard
-- Task listing and management
-- Reactive forms with validation
-- Priority and category filters
-- Search and sorting controls
-- Loading and error states
-- Integration with FastAPI REST endpoints
-- Tailwind CSS styling
+- Angular application shell with a header, sidebar, and nested routing
+- Responsive dashboard/task-page layout styled with Tailwind CSS
+- Desktop sidebar collapse/expand and mobile navigation drawer
+- Reusable `TaskCard`, `TaskList`, `TaskStats`, and `TaskFilter` components
+- Local task listing and deletion using Angular Signals
+- Reactive task statistics using `computed()`
+- Combined client-side filtering by status, priority, and category, including Reset
+- Filtered-result counter and empty-filter state
+- Parent–child communication with `input()` and `output()`
+- Light/dark styling support
+
+**Important:** The frontend currently uses local mock tasks. Changes made in the UI are **not yet persisted** in SQLite. Some navigation entries are placeholders; only the currently implemented routes are expected to work.
+
+### Frontend — Next
+
+- Reactive task creation and editing forms with validation
+- Angular service integration with the FastAPI REST endpoints
+- Loading, success, and error states
+- Server-side search, pagination, filtering, and sorting
+- Frontend tests and full-stack validation
 
 ## Project Structure
 
@@ -58,17 +67,26 @@ taskflow/
 │   └── tests/
 │       ├── conftest.py
 │       └── test_tasks.py
-├── frontend/                 # Angular application (planned)
+├── frontend/                  # Angular application
+│   ├── src/
+│   │   └── app/
+│   │       ├── layout/       # Header, sidebar, main layout
+│   │       └── features/
+│   │           └── tasks/    # Task models, pages, components
+│   ├── package.json
+│   └── angular.json
 ├── .gitignore
 └── README.md
 ```
+
+*The tree is a simplified architectural overview; consult the repository for exact file and directory names.*
 
 ## Getting Started
 
 ### Prerequisites
 
-- Python 3.11 or newer
-- pip
+- Python 3.11+ and pip
+- Node.js and npm compatible with the Angular version in `frontend/package.json`
 - Git
 
 ### 1. Clone the repository
@@ -78,204 +96,197 @@ git clone https://github.com/mustafataha5/taskflow.git
 cd taskflow
 ```
 
-Replace `YOUR_USERNAME` with your GitHub username.
+> The actively developed frontend may be ahead of `main`. To inspect the current frontend work, switch to `feature/angular-frontend` after it has received the relevant feature-branch merges.
 
-### 2. Set up the backend
+### 2. Run the backend
 
 ```bash
 cd backend
-
 python3 -m venv .venv
 source .venv/bin/activate
-
 pip install -r requirements.txt
-```
-
-For Windows:
-
-```powershell
-.venv\Scripts\activate
-```
-
-### 3. Start the API
-
-```bash
 uvicorn main:app --reload
 ```
 
-The API runs at:
+On Windows, activate the environment with `.venv\Scripts\activate` instead.
 
-`http://127.0.0.1:8000`
+API base URL: <http://127.0.0.1:8000>
 
-FastAPI automatically provides interactive documentation:
+- Swagger UI: <http://127.0.0.1:8000/docs>
+- OpenAPI schema: <http://127.0.0.1:8000/openapi.json>
 
-- Swagger UI: `http://127.0.0.1:8000/docs`
-- OpenAPI specification: `http://127.0.0.1:8000/openapi.json`
+The development SQLite database is initialized by the backend application.
 
-The SQLite database is initialized automatically when the application starts.
+### 3. Run the frontend
 
-## API Endpoints
+Open a second terminal at the repository root:
+
+```bash
+cd frontend
+npm install
+npx ng serve
+```
+
+Open <http://localhost:4200>.
+
+**Note:** Until API integration is implemented, the task list displays mock data even when the backend is running.
+
+## API Reference
 
 | Method | Endpoint | Description |
-|---|---|---|
-| GET | `/health` | Health check |
-| GET | `/tasks` | List, filter, sort and paginate tasks |
-| GET | `/tasks/{task_id}` | Retrieve a task by ID |
-| POST | `/tasks` | Create a task |
-| PATCH | `/tasks/{task_id}` | Partially update a task |
-| DELETE | `/tasks/{task_id}` | Delete a task |
+| --- | --- | --- |
+| `GET` | `/health` | Check API health |
+| `GET` | `/tasks` | List tasks with optional filtering, sorting, and pagination |
+| `GET` | `/tasks/{task_id}` | Retrieve a task by ID |
+| `POST` | `/tasks` | Create a task |
+| `PATCH` | `/tasks/{task_id}` | Partially update a task |
+| `DELETE` | `/tasks/{task_id}` | Delete a task |
 
-### Example: Create a Task
+### Create a task
 
-**POST** `/tasks`
+`POST /tasks`
 
 ```json
 {
-  "title": "Learn Angular",
-  "description": "Practice RxJS and Signals",
+  "title": "Implement Angular task forms",
+  "description": "Practice reactive forms and validation",
+  "status": "todo",
   "priority": "high",
   "category": "learning",
   "due_date": "2026-12-01T18:00:00Z"
 }
 ```
 
-Example response (HTTP 201):
+### Update a task
+
+`PATCH /tasks/1`
 
 ```json
 {
-  "id": 1,
-  "title": "Learn Angular",
-  "description": "Practice RxJS and Signals",
-  "completed": false,
-  "priority": "high",
-  "category": "learning",
-  "due_date": "2026-12-01T18:00:00Z",
-  "created_at": "2026-11-07T18:00:00Z",
-  "updated_at": "2026-11-07T18:00:00Z"
-}
-```
-
-### Example: Update a Task
-
-**PATCH** `/tasks/1`
-
-```json
-{
-  "completed": true,
+  "status": "in_progress",
   "priority": "medium"
 }
 ```
 
-Only the supplied fields are updated. The `updated_at` timestamp is refreshed for non-empty PATCH requests.
+Only supplied fields are updated. A non-empty PATCH request refreshes `updated_at`.
 
-### Filtering, Sorting and Pagination
-
-Example request:
+### Filter, sort, and paginate
 
 ```http
-GET /tasks?page=1&page_size=10&priority=high&category=learning&sort_by=due_date&order=asc
+GET /tasks?page=1&page_size=10&status=todo&priority=high&category=learning&sort_by=due_date&order=asc
 ```
 
-Supported query parameters:
+| Parameter | Values | Default |
+| --- | --- | --- |
+| `page` | Integer ≥ 1 | `1` |
+| `page_size` | Integer, maximum 100 | `10` |
+| `status` | `todo`, `in_progress`, `completed`, `archived` | All |
+| `priority` | `low`, `medium`, `high` | All |
+| `category` | `work`, `personal`, `learning`, `health`, `finance`, `other` | All |
+| `sort_by` | `created_at`, `due_date` | `created_at` |
+| `order` | `asc`, `desc` | `desc` |
 
-| Parameter | Description | Default |
-|---|---|---|
-| `page` | Page number, starting at 1 | `1` |
-| `page_size` | Records per page, maximum 100 | `10` |
-| `priority` | Filter by low, medium or high | All |
-| `category` | Filter by work, personal or learning | All |
-| `completed` | Filter by true or false | All |
-| `sort_by` | `created_at` or `due_date` | `created_at` |
-| `order` | `asc` or `desc` | `desc` |
-
-The endpoint currently returns a JSON array of tasks.
+The task listing currently returns a JSON array. Pagination metadata in a response wrapper is not implemented.
 
 ## Automated Testing
 
-The backend uses pytest and FastAPI TestClient for automated API tests.
-
-Run the tests from the `backend` directory:
+Run the backend test suite from `backend/`:
 
 ```bash
 python -m pytest -v
 ```
 
-The test suite covers:
+Tests cover the health endpoint, CRUD operations, error handling, validation, timestamps, filtering, sorting, and pagination. Task tests use an isolated SQLite test database.
 
-- Health check
-- Task creation and retrieval
-- Task updates and timestamps
-- Task deletion
-- Missing-task error handling
-- Invalid input validation
-- Pagination
-- Filtering
-- Sorting
+**Latest previously reported backend result:** 24 tests passed. Rerun the command above for the current result.
 
-**Latest local result:** 14 tests passed.
+## Angular Architecture
 
-Tests use an isolated in-memory SQLite database for task operations.
+TaskFlow uses **smart (container)** and **presentational** components:
+
+```text
+TaskListPage (container)
+├── TaskStats        ← all tasks
+├── TaskFilter       ↔ filter values and change events
+└── TaskList         ← filtered tasks
+    └── TaskCard     → delete event
+```
+
+- `TaskListPage` owns the local task and filter signals.
+- `computed()` derives filtered tasks and statistics without manually synchronizing copies.
+- `TaskFilter` receives values via `input()` and reports changes via `output()`.
+- `TaskStats` always receives the complete task list, regardless of active filters.
+- `MainLayout` owns sidebar state for desktop collapse and mobile drawer visibility.
+
+This architecture is intentionally being developed incrementally before introducing API-driven shared state.
 
 ## Development Workflow
 
-TaskFlow uses feature branches and pull requests.
+Active frontend development uses an integration branch and short-lived feature branches:
 
 ```text
 main
-  |
-  +-- feature/backend-crud
-  |
-  +-- feature/angular-frontend (planned)
-  |
-  +-- future feature branches
+└── feature/angular-frontend
+    ├── feature/task-filtering   # Filtering and responsive UI
+    └── feature/task-forms       # Next planned feature
 ```
 
-Development workflow:
+The diagram describes **branch lineage and intended merges**, not independent permanent branches. Feature changes are reviewed and merged into `feature/angular-frontend`, and the completed frontend will eventually be merged into `main`.
 
-1. Create a feature branch from `main`.
-2. Implement and test the feature.
-3. Commit changes with descriptive commit messages.
-4. Push the branch to GitHub.
-5. Open a Pull Request.
-6. Review and merge changes into `main`.
-7. Delete the merged feature branch when no longer needed.
+Recommended workflow:
 
-### Commit Naming
+1. Create a feature branch from the latest `feature/angular-frontend`.
+2. Implement and test one feature.
+3. Commit with a descriptive Conventional Commit message.
+4. Push the branch and open a pull request targeting `feature/angular-frontend`.
+5. Review, merge, and update your local integration branch.
+6. Merge the integration branch into `main` when the frontend is ready.
 
-The project follows Conventional Commit naming conventions.
+Example commit messages:
 
 ```text
-feat: add new functionality
-fix: resolve a bug
-test: add or update tests
-docs: update documentation
-chore: maintain project configuration
-refactor: improve code without changing behavior
+feat(frontend): add task filtering and responsive layout
+feat(frontend): add reactive task form
+fix(frontend): close mobile sidebar after navigation
+test(api): cover task filtering and pagination
+docs: update development progress
 ```
 
 ## Roadmap
 
-- [x] FastAPI backend and SQLite database
-- [x] Task CRUD operations
-- [x] Priority, category, due date and timestamps
-- [x] Pagination, filtering and sorting
-- [x] Automated backend tests
-- [ ] Angular frontend initialization
-- [ ] Angular components and task management pages
-- [ ] FastAPI integration through Angular services
-- [ ] Reactive forms, Signals and RxJS
-- [ ] Responsive UI with Tailwind CSS
-- [ ] Full-stack testing and V1 release
+### Phase 1 — Backend
+
+- [x] FastAPI, SQLModel, and SQLite setup
+- [x] Task CRUD, enums, due dates, and timestamps
+- [x] Validation and error handling
+- [x] Filtering, sorting, and pagination
+- [x] Backend automated tests
+
+### Phase 2 — Angular Frontend
+
+- [x] Angular setup, standalone components, and routing
+- [x] Header, sidebar, and main layout
+- [x] Task models and local mock task data
+- [x] Reusable task list and cards
+- [x] Task statistics with computed Signals
+- [x] Local deletion with `signal.update()`
+- [x] **2.5:** Task filters, reset, and responsive UI
+- [x] Desktop collapsible sidebar and mobile drawer
+- [ ] **2.6:** Reactive create/edit task forms
+- [ ] **2.7:** FastAPI integration through Angular services
+- [ ] **2.8:** API loading/error handling and server-side list controls
+- [ ] Frontend and end-to-end tests
+
+### V1 Release
+
+- [ ] Persistent task management through the UI
+- [ ] Final responsive and accessibility checks
+- [ ] Documentation and release verification
+- [ ] Tag first stable release as `v1.0.0`
 
 ## Versioning
 
-TaskFlow will use Git tags and GitHub Releases.
-
-The first stable full-stack release will be tagged:
-
-`v1.0.0`
-
-Future changes will follow Semantic Versioning where applicable.
+TaskFlow plans to use Git tags and GitHub Releases, beginning with `v1.0.0` for the first stable full-stack version. Future releases will follow Semantic Versioning where applicable.
 
 ## License
 
@@ -283,4 +294,4 @@ No license has been selected yet.
 
 ---
 
-**TaskFlow** — A hands-on full-stack engineering project focused on building maintainable software and practicing real-world development workflows.
+**TaskFlow** — Learning by building a maintainable, tested, full-stack application.
