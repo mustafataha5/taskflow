@@ -1,1 +1,78 @@
-<p>task-card works!</p>
+<div
+  class="group relative flex flex-col justify-between rounded-2xl border border-sky-100 bg-white p-5 shadow-sm transition-all hover:border-[#12c1b9]/50 hover:shadow-md dark:border-slate-800 dark:bg-slate-900 dark:hover:border-[#12c1b9]/50">
+  <div>
+    <!-- Top Row: Category, Priority & Delete Action -->
+    <div class="flex items-center justify-between gap-2 mb-3">
+      <div class="flex items-center gap-2">
+        <span
+          class="inline-flex items-center rounded-lg bg-sky-50 px-2.5 py-1 text-xs font-medium text-[#12c1b9] dark:bg-slate-800 dark:text-[#12c1b9] capitalize">
+          {{ task().category }}
+        </span>
+
+        <!-- Priority Badge -->
+        <span [ngClass]="{
+          'bg-rose-50 text-rose-600 dark:bg-rose-950/50 dark:text-rose-400': task().priority === 'high',
+          'bg-amber-50 text-amber-600 dark:bg-amber-950/50 dark:text-amber-400': task().priority === 'medium',
+          'bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400': task().priority === 'low'
+        }" class="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-semibold capitalize">
+          <span class="h-1.5 w-1.5 rounded-full" [ngClass]="{
+            'bg-rose-500': task().priority === 'high',
+            'bg-amber-500': task().priority === 'medium',
+            'bg-blue-500': task().priority === 'low'
+          }"></span>
+          {{ task().priority }}
+        </span>
+      </div>
+
+      <!-- Delete Button (Visible on Hover) -->
+      <button type="button" (click)="onDelete()" [attr.aria-label]="'Delete task: ' + task().title" class="rounded-lg p-1.5 text-slate-400
+         opacity-100
+         sm:opacity-0
+         sm:group-hover:opacity-100
+         focus-visible:opacity-100
+         hover:bg-rose-50 hover:text-rose-600
+         dark:hover:bg-rose-950/50
+         dark:hover:text-rose-400
+         transition-opacity">
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M19 7l-.867 12.142A2.000 2.000 0 0116.138 21H7.862a2.000 2.000 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Title & Description -->
+    <h3 class="min-w-0 break-words line-clamp-1 text-base font-semibold
+         text-slate-800 dark:text-white">
+      {{ task().title }}
+    </h3>
+    @if (task().description) {
+    <p class="mt-1.5 text-sm text-slate-500 dark:text-slate-400 line-clamp-2">
+      {{ task().description }}
+    </p>
+    }
+  </div>
+
+  <!-- Card Footer: Status & Due Date -->
+  <div class="mt-6 flex items-center justify-between border-t border-sky-50 pt-4 dark:border-slate-800/80">
+    <!-- Status Badge -->
+    <span [ngClass]="{
+      'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400': task().status === 'completed',
+      'bg-sky-50 text-[#12c1b9] dark:bg-sky-950/50 dark:text-[#12c1b9]': task().status === 'in_progress',
+      'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300': task().status === 'todo',
+      'bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400': task().status === 'archived'
+    }" class="inline-flex items-center rounded-lg px-2.5 py-1 text-xs font-medium capitalize">
+      {{ task().status.replace('_', ' ') }}
+    </span>
+
+    @if (task().due_date) {
+    <div class="flex items-center gap-1.5 text-xs text-slate-400 dark:text-slate-500">
+      <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+      <span>{{ task().due_date | date:'mediumDate' }}</span>
+    </div>
+    }
+  </div>
+</div>

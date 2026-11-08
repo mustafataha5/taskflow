@@ -1,1 +1,28 @@
-<p>task-list-page works!</p>
+<div class="space-y-6">
+  <!-- Page Header & Actions -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">TaskFlow Tasks</h1>
+      <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Manage, organize, and track your project tasks efficiently.</p>
+    </div>
+
+    <button type="button" routerLink="/tasks/new"
+      class="inline-flex items-center justify-center gap-2 rounded-xl bg-[#12c1b9] px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-[#12c1b9]/30 transition-all hover:bg-[#0fa8a1] focus:outline-none focus:ring-2 focus:ring-[#12c1b9]/25">
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+      </svg>
+      New Task
+    </button>
+  </div>
+
+  <!-- Task Stats Component -->
+  <app-task-stats [tasks]="tasks()" />
+
+  <!-- Task List Component -->
+  <div>
+    <app-task-list
+      [tasks]="tasks()"
+      (deleteTask)="onDeleteTask($event)"
+    />
+  </div>
+</div>
