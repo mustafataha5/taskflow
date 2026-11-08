@@ -10,6 +10,13 @@ from sqlmodel import SQLModel, Field
 # 1. ENUMS
 # -----------------------------------
 
+class Status(str, Enum):
+    TODO = "todo"
+    IN_PROGRESS = "in_progress"
+    COMPLETED = "completed"
+    ARCHIVED = "archived"
+
+
 class Priority(str, Enum):
     LOW = "low"
     MEDIUM = "medium"
@@ -20,6 +27,9 @@ class Category(str, Enum):
     WORK = "work"
     PERSONAL = "personal"
     LEARNING = "learning"
+    HEALTH = "health"
+    FINANCE = "finance"
+    OTHER = "other"
 
 
 # -----------------------------------
@@ -30,7 +40,7 @@ class TaskBase(SQLModel):
     title: str = Field(min_length=2, max_length=100)
     description: str = Field(default="", max_length=500)
 
-    completed: bool = False
+    status: Status = Status.TODO
 
     priority: Priority = Priority.MEDIUM
     category: Category = Category.PERSONAL
@@ -83,7 +93,7 @@ class TaskUpdate(SQLModel):
         max_length=500
     )
 
-    completed: bool | None = None
+    status: Status | None = None
     priority: Priority | None = None
     category: Category | None = None
     due_date: AwareDatetime | None = None
@@ -91,7 +101,7 @@ class TaskUpdate(SQLModel):
     @field_validator(
         "title",
         "description",
-        "completed",
+        "status",
         "priority",
         "category"
     )
