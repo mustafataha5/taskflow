@@ -1,59 +1,252 @@
-<!-- Sidebar Component Template -->
-<aside class="flex h-[calc(100vh-4rem)] w-64 flex-col justify-between border-r border-sky-100 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
-  <div class="space-y-6">
-    <div>
-      <p class="px-3 text-xs font-semibold uppercase tracking-wider text-slate-400">Main Menu</p>
-      <nav class="mt-3 space-y-1">
-        <a routerLink="/dashboard" routerLinkActive="bg-sky-50 text-[#12c1b9] font-semibold dark:bg-slate-800" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-slate-600 transition-colors hover:bg-sky-50 hover:text-[#12c1b9] dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white">
-          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-          </svg>
-          Dashboard
-        </a>
 
-        <a routerLink="/tasks" routerLinkActive="bg-sky-50 text-[#12c1b9] font-semibold dark:bg-slate-800" class="flex items-center justify-between rounded-xl px-3 py-2.5 text-sm text-slate-600 transition-colors hover:bg-sky-50 hover:text-[#12c1b9] dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white">
-          <div class="flex items-center gap-3">
-            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+<aside
+  class="flex h-full w-full flex-col overflow-hidden
+         border-r border-slate-200 bg-white
+         dark:border-slate-800 dark:bg-slate-900"
+>
+  <!-- Sidebar Top -->
+  <div class="flex min-h-0 flex-1 flex-col overflow-y-auto px-3 py-5">
+
+    <!-- Collapse Button: Desktop Only -->
+    <div
+      class="mb-5 hidden items-center
+             lg:flex"
+      [class.justify-center]="collapsed()"
+      [class.justify-between]="!collapsed()"
+    >
+      @if (!collapsed()) {
+        <span
+          class="px-3 text-xs font-semibold uppercase
+                 tracking-widest text-slate-400"
+        >
+          Navigation
+        </span>
+      }
+
+      <button
+        type="button"
+        (click)="toggleCollapse.emit()"
+        [attr.aria-label]="collapsed() ? 'Expand sidebar' : 'Collapse sidebar'"
+        [attr.aria-expanded]="!collapsed()"
+        class="flex h-9 w-9 items-center justify-center
+               rounded-xl text-slate-500 transition-colors
+               hover:bg-teal-50 hover:text-teal-600
+               dark:text-slate-400 dark:hover:bg-slate-800
+               dark:hover:text-teal-400"
+      >
+        <svg
+          class="h-5 w-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          @if (collapsed()) {
+            <path d="M9 6l6 6-6 6" />
+          } @else {
+            <path d="M15 6l-6 6 6 6" />
+          }
+        </svg>
+      </button>
+    </div>
+
+    <!-- Main Menu -->
+    <div class="mb-7">
+      @if (!collapsed()) {
+        <p
+          class="mb-3 px-3 text-[11px] font-bold uppercase
+                 tracking-widest text-slate-400"
+        >
+          Main Menu
+        </p>
+      } @else {
+        <div class="mx-auto mb-4 h-px w-7 bg-slate-200
+                    dark:bg-slate-700"></div>
+      }
+
+      <nav aria-label="Main navigation" class="space-y-1">
+        @for (item of mainMenu; track item.route) {
+          <a
+            [routerLink]="item.route"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: item.route !== '/tasks' }"
+            (click)="navigate.emit()"
+            [attr.title]="collapsed() ? item.label : null"
+            class="group relative flex min-h-11 items-center gap-3
+                   rounded-xl px-3 py-3 text-sm font-medium
+                   text-slate-600 transition-all duration-200
+                   hover:bg-slate-100 hover:text-teal-700
+                   [&.active]:bg-teal-50
+                   [&.active]:font-semibold
+                   [&.active]:text-teal-700
+                   dark:text-slate-400
+                   dark:hover:bg-slate-800
+                   dark:hover:text-teal-300
+                   dark:[&.active]:bg-teal-500/10
+                   dark:[&.active]:text-teal-400"
+            [class.justify-center]="collapsed()"
+            [class.px-0]="collapsed()"
+          >
+            <!-- Active indicator -->
+            <span
+              class="absolute left-0 top-1/2 h-5 w-[3px]
+                     -translate-y-1/2 rounded-r-full
+                     bg-teal-500 opacity-0
+                     group-[.active]:opacity-100"
+            ></span>
+
+            <!-- Icon -->
+            <svg
+              class="h-5 w-5 shrink-0"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              @switch (item.icon) {
+                @case ('dashboard') {
+                  <path d="M3 10.5 12 3l9 7.5V21h-7v-7h-4v7H3z"/>
+                }
+                @case ('tasks') {
+                  <rect x="5" y="4" width="14" height="17" rx="2"/>
+                  <path d="m9 12 2 2 4-4"/>
+                }
+                @case ('projects') {
+                  <path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v10H3z"/>
+                }
+                @case ('analytics') {
+                  <path d="M4 20V11h4v9M10 20V6h4v14M16 20V3h4v17"/>
+                }
+              }
             </svg>
-            My Tasks
-          </div>
-          <span class="rounded-full bg-sky-100 px-2 py-0.5 text-xs font-semibold text-[#12c1b9] dark:bg-slate-800">12</span>
-        </a>
 
-        <a routerLink="/projects" routerLinkActive="bg-sky-50 text-[#12c1b9] font-semibold dark:bg-slate-800" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-slate-600 transition-colors hover:bg-sky-50 hover:text-[#12c1b9] dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white">
-          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-          </svg>
-          Projects
-        </a>
-
-        <a routerLink="/analytics" routerLinkActive="bg-sky-50 text-[#12c1b9] font-semibold dark:bg-slate-800" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-slate-600 transition-colors hover:bg-sky-50 hover:text-[#12c1b9] dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white">
-          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-          </svg>
-          Analytics
-        </a>
+            @if (!collapsed()) {
+              <span class="min-w-0 flex-1 truncate">
+                {{ item.label }}
+              </span>
+            }
+          </a>
+        }
       </nav>
     </div>
 
+    <!-- Workspace Menu -->
     <div>
-      <p class="px-3 text-xs font-semibold uppercase tracking-wider text-slate-400">Workspace</p>
-      <nav class="mt-3 space-y-1">
-        <a routerLink="/team" routerLinkActive="bg-sky-50 text-[#12c1b9] font-semibold dark:bg-slate-800" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-slate-600 transition-colors hover:bg-sky-50 hover:text-[#12c1b9] dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white">
-          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-          </svg>
-          Team Members
-        </a>
+      @if (!collapsed()) {
+        <p
+          class="mb-3 px-3 text-[11px] font-bold uppercase
+                 tracking-widest text-slate-400"
+        >
+          Workspace
+        </p>
+      } @else {
+        <div class="mx-auto mb-4 h-px w-7 bg-slate-200
+                    dark:bg-slate-700"></div>
+      }
 
-        <a routerLink="/settings" routerLinkActive="bg-sky-50 text-[#12c1b9] font-semibold dark:bg-slate-800" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-slate-600 transition-colors hover:bg-sky-50 hover:text-[#12c1b9] dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white">
-          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
-          Settings
-        </a>
+      <nav aria-label="Workspace navigation" class="space-y-1">
+        @for (item of workspaceMenu; track item.route) {
+          <a
+            [routerLink]="item.route"
+            routerLinkActive="active"
+            (click)="navigate.emit()"
+            [attr.title]="collapsed() ? item.label : null"
+            class="group relative flex min-h-11 items-center gap-3
+                   rounded-xl px-3 py-3 text-sm font-medium
+                   text-slate-600 transition-all duration-200
+                   hover:bg-slate-100 hover:text-teal-700
+                   [&.active]:bg-teal-50
+                   [&.active]:font-semibold
+                   [&.active]:text-teal-700
+                   dark:text-slate-400
+                   dark:hover:bg-slate-800
+                   dark:hover:text-teal-300
+                   dark:[&.active]:bg-teal-500/10
+                   dark:[&.active]:text-teal-400"
+            [class.justify-center]="collapsed()"
+            [class.px-0]="collapsed()"
+          >
+            <span
+              class="absolute left-0 top-1/2 h-5 w-[3px]
+                     -translate-y-1/2 rounded-r-full
+                     bg-teal-500 opacity-0
+                     group-[.active]:opacity-100"
+            ></span>
+
+            <svg
+              class="h-5 w-5 shrink-0"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              @switch (item.icon) {
+                @case ('team') {
+                  <circle cx="9" cy="8" r="3"/>
+                  <path d="M3 20v-2a6 6 0 0 1 12 0v2M17 5a3 3 0 0 1 0 6M17 14a5 5 0 0 1 4 5v1"/>
+                }
+                @case ('settings') {
+                  <circle cx="12" cy="12" r="3"/>
+                  <path d="M10 2h4l.7 2.4 2.2 1.2 2.4-.7 2 3.4-1.7 1.8v2.6l1.7 1.8-2 3.4-2.4-.7-2.2 1.2L14 22h-4l-.7-2.4-2.2-1.2-2.4.7-2-3.4 1.7-1.8v-2.6L2.7 9.5l2-3.4 2.4.7 2.2-1.2z"/>
+                }
+              }
+            </svg>
+
+            @if (!collapsed()) {
+              <span class="truncate">{{ item.label }}</span>
+            }
+          </a>
+        }
       </nav>
+    </div>
+
+  </div>
+
+  <!-- Sidebar Footer -->
+  <div class="border-t border-slate-200 p-3 dark:border-slate-800">
+    <div
+      class="flex items-center gap-3 rounded-xl
+             bg-slate-50 p-3 dark:bg-slate-800/60"
+      [class.justify-center]="collapsed()"
+    >
+      <div
+        class="flex h-9 w-9 shrink-0 items-center
+               justify-center rounded-lg bg-teal-500/10
+               text-teal-600 dark:text-teal-400"
+      >
+        <svg
+          class="h-5 w-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          stroke-width="1.8"
+          aria-hidden="true"
+        >
+          <circle cx="12" cy="12" r="9"/>
+          <path d="M12 16v-4m0-4h.01"/>
+        </svg>
+      </div>
+
+      @if (!collapsed()) {
+        <div class="min-w-0">
+          <p class="truncate text-xs font-semibold text-slate-700 dark:text-slate-200">
+            TaskFlow
+          </p>
+          <p class="text-[11px] text-slate-400">
+            Version 1.0
+          </p>
+        </div>
+      }
     </div>
   </div>
+
+</aside>
