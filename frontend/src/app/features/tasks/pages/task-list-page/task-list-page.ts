@@ -1,4 +1,4 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { Task } from '../../models/task.model';
 import { CommonModule } from '@angular/common';
 
@@ -8,6 +8,7 @@ import { TaskList } from '../../components/task-list/task-list';
 import { TaskStats } from '../../components/task-stats/task-stats';
 import { TaskFilters } from '../../models/task-filter.model';
 import { TaskFilter } from '../../components/task-filter/task-filter';
+import { TaskStoreService } from '../../services/task-store.service';
 
 @Component({
   imports: [RouterLink, TaskList, TaskStats, TaskFilter],
@@ -16,63 +17,10 @@ import { TaskFilter } from '../../components/task-filter/task-filter';
   templateUrl: './task-list-page.html',
 })
 export class TaskListPage {
-  readonly tasks = signal<Task[]>([
-    {
-      id: 1,
-      title: 'Design Angular UI components with Tailwind CSS',
-      description: 'Create responsive sidebar, header, and task grid layout using sky-blue theme.',
-      status: 'completed',
-      priority: 'high',
-      category: 'work',
-      due_date: '2026-11-07T12:00:00Z',
-      created_at: '2026-11-06T09:00:00Z',
-      updated_at: '2026-11-07T14:30:00Z'
-    },
-    {
-      id: 2,
-      title: 'Implement FastAPI backend endpoints',
-      description: 'Set up CRUD routes for tasks using SQLAlchemy and Pydantic models.',
-      status: 'in_progress',
-      priority: 'high',
-      category: 'work',
-      due_date: '2026-11-10T18:00:00Z',
-      created_at: '2026-11-07T10:00:00Z',
-      updated_at: '2026-11-08T11:15:00Z'
-    },
-    {
-      id: 3,
-      title: 'Study advanced Angular Signals',
-      description: 'Explore computed signals, effect, and custom reactive state management patterns.',
-      status: 'in_progress',
-      priority: 'medium',
-      category: 'learning',
-      due_date: '2026-11-12T15:00:00Z',
-      created_at: '2026-11-08T08:30:00Z',
-      updated_at: '2026-11-08T08:30:00Z'
-    },
-    {
-      id: 4,
-      title: 'Weekly gym and cardio workout',
-      description: 'Complete strength training sessions and maintain consistency with fitness routine.',
-      status: 'todo',
-      priority: 'medium',
-      category: 'health',
-      due_date: '2026-11-09T20:00:00Z',
-      created_at: '2026-11-08T08:30:00Z',
-      updated_at: '2026-11-08T08:30:00Z'
-    },
-    {
-      id: 5,
-      title: 'Review monthly financial budget',
-      description: 'Reconcile cash flow statements and check short-term liquidity risk buffers.',
-      status: 'todo',
-      priority: 'low',
-      category: 'finance',
-      due_date: '2026-11-15T12:00:00Z',
-      created_at: '2026-11-08T08:30:00Z',
-      updated_at: '2026-11-08T08:30:00Z'
-    }
-  ]);
+  private readonly taskStore = inject(TaskStoreService);
+
+// Shared tasks signal
+readonly tasks = this.taskStore.tasks;
 
   readonly filters = signal<TaskFilters>({
     status: 'all',
@@ -85,7 +33,7 @@ export class TaskListPage {
   );
 
   onDeleteTask(taskId: number): void {
-    this.tasks.update(tasks => tasks.filter(t => t.id !== taskId));
+    this.taskStore.deleteTask(taskId);
   }
 
   readonly filteredTasks = computed(() => {
