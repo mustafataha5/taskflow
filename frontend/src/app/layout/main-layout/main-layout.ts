@@ -1,12 +1,28 @@
-import { Component } from '@angular/core';
+
+import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { Sidebar } from '../sidebar/sidebar';
 import { Header } from '../header/header';
+import { Sidebar } from '../sidebar/sidebar';
 
 @Component({
-  imports: [RouterOutlet, Sidebar, Header],
   selector: 'app-main-layout',
-  styleUrl: './main-layout.css',
+  imports: [RouterOutlet, Header, Sidebar],
   templateUrl: './main-layout.html',
+  styleUrl: './main-layout.css',
 })
-export class MainLayout {}
+export class MainLayout {
+  readonly sidebarCollapsed = signal(false);
+  readonly mobileSidebarOpen = signal(false);
+
+  toggleSidebar(): void {
+    this.sidebarCollapsed.update(value => !value);
+  }
+
+  toggleMobileSidebar(): void {
+    this.mobileSidebarOpen.update(value => !value);
+  }
+
+  closeMobileSidebar(): void {
+    this.mobileSidebarOpen.set(false);
+  }
+}

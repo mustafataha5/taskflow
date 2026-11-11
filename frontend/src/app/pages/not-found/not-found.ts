@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Location } from '@angular/common';
+import { Component, inject } from '@angular/core';
 
 @Component({
   imports: [],
@@ -6,4 +7,11 @@ import { Component } from '@angular/core';
   styleUrl: './not-found.css',
   templateUrl: './not-found.html',
 })
-export class NotFound {}
+export class NotFound {
+
+  private readonly location = inject(Location);
+
+  goBack(): void {
+    this.location.back();
+  }
+}

@@ -1,13 +1,43 @@
-import { Component, input } from '@angular/core';
-import { Task } from '../../models/task.model';
+import { Component, input, output } from '@angular/core';
+import { TaskFilters } from '../../models/task-filter.model';
 
 @Component({
-  imports: [],
   selector: 'app-task-filter',
-  styleUrl: './task-filter.css',
+  imports: [],
   templateUrl: './task-filter.html',
+  styleUrl: './task-filter.css',
 })
 export class TaskFilter {
+  readonly filters = input.required<TaskFilters>();
 
-  tasks = input.required<Task []>() ; 
+  readonly filtersChange = output<TaskFilters>();
+
+  updateStatus(status: TaskFilters['status']): void {
+    this.filtersChange.emit({
+      ...this.filters(),
+      status,
+    });
+  }
+
+  updatePriority(priority: TaskFilters['priority']): void {
+    this.filtersChange.emit({
+      ...this.filters(),
+      priority,
+    });
+  }
+
+  updateCategory(category: TaskFilters['category']): void {
+    this.filtersChange.emit({
+      ...this.filters(),
+      category,
+    });
+  }
+
+  resetFilters(): void {
+    this.filtersChange.emit({
+      status: 'all',
+      priority: 'all',
+      category: 'all',
+    });
+  }
 }
