@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { Task } from '../../models/task.model';
 import { CommonModule } from '@angular/common';
 
@@ -16,11 +16,16 @@ import { TaskStoreService } from '../../services/task-store.service';
   styleUrl: './task-list-page.css',
   templateUrl: './task-list-page.html',
 })
-export class TaskListPage {
-  private readonly taskStore = inject(TaskStoreService);
+export class TaskListPage implements OnInit {
+  readonly taskStore = inject(TaskStoreService);
 
-// Shared tasks signal
-readonly tasks = this.taskStore.tasks;
+  ngOnInit(): void {
+    // Load the first page of tasks on component initialization
+    this.taskStore.loadTasks(1);
+  }
+
+  // Shared tasks signal
+  readonly tasks = this.taskStore.tasks;
 
   readonly filters = signal<TaskFilters>({
     status: 'all',
@@ -31,6 +36,13 @@ readonly tasks = this.taskStore.tasks;
   readonly completedCount = computed(
     () => this.tasks().filter(task => task.status === 'completed').length
   );
+
+  /**
+   * Navigate to a specific page using the task store.
+   */
+  goToPage(page: number): void {
+    this.taskStore.loadTasks(page);
+  }
 
   onDeleteTask(taskId: number): void {
     this.taskStore.deleteTask(taskId);

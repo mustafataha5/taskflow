@@ -83,28 +83,22 @@ export class TaskForm {
   }
 
   onSubmit(): void {
-
-    // Prevent duplicate submissions
     if (this.saving()) {
       return;
     }
 
-    // Validate inputs
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
 
-    // Read all form values
     const values = this.form.getRawValue();
 
-    // Normalize empty date into null
     const taskData: TaskCreate = {
       ...values,
-      due_date: values.due_date || null
+      due_date: `${values.due_date}T00:00:00Z`,
     };
 
-    // Notify the parent
     this.save.emit(taskData);
   }
 }
