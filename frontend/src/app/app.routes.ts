@@ -1,7 +1,7 @@
 
 import { Routes } from '@angular/router';
 import { numericIdGuard } from './core/guards/numeric-id-guard';
-import { taskIdGuard } from './core/guards/task-id.guard-guard';
+import { taskIdGuard } from './core/guards/task-id.guard';
 
 export const routes: Routes = [
   {
