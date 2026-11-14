@@ -1,3 +1,4 @@
+export type TaskView = 'list' | 'table' | 'board';
 
 export type TaskStatus =
   | 'todo'
@@ -17,6 +18,7 @@ export type TaskCategory =
   | 'health'
   | 'finance'
   | 'other';
+
 
 // Complete task returned by FastAPI
 export interface Task {
@@ -56,4 +58,15 @@ export interface TaskQueryParams {
   status?: TaskStatus;
   sort_by?: 'created_at' | 'due_date';
   order?: 'asc' | 'desc';
+}
+
+export interface TaskStatsModel {
+  total: number;
+  by_status: {
+    todo: number;
+    in_progress: number;
+    completed: number;
+    archived: number;
+  };
+  overdue: number;
 }
