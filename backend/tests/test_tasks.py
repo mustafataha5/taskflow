@@ -1,4 +1,3 @@
-
 from datetime import datetime
 
 
@@ -244,6 +243,55 @@ def test_delete_task(client):
 
 
 # -----------------------------------
+# TASK STATISTICS
+# -----------------------------------
+
+def test_get_task_stats(client):
+    create_task(client, title="Todo 1", task_status="todo")
+    create_task(client, title="In Progress 1", task_status="in_progress")
+    create_task(client, title="Completed 1", task_status="completed")
+    # Overdue task (past due date, unfinished)
+    create_task(client, title="Overdue task", task_status="todo", due_date="2020-01-01T00:00:00Z")
+
+    response = client.get("/tasks/stats")
+    assert response.status_code == 200
+
+    data = response.json()
+    assert data["total"] == 4
+    assert data["by_status"]["todo"] == 2
+    assert data["by_status"]["in_progress"] == 1
+    assert data["by_status"]["completed"] == 1
+    assert data["by_status"]["archived"] == 0
+    assert data["overdue"] >= 1
+
+
+# -----------------------------------
+# KANBAN TASKS BY STATUS
+# -----------------------------------
+
+def test_get_tasks_by_status(client):
+    create_task(client, title="Kanban Todo", task_status="todo")
+
+    response = client.get("/tasks/by-status/todo")
+    assert response.status_code == 200
+
+    tasks = response.json()
+    assert len(tasks) >= 1
+    assert all(t["status"] == "todo" for t in tasks)
+
+
+def test_get_tasks_by_status_empty(client):
+    response = client.get("/tasks/by-status/archived")
+    assert response.status_code == 200
+    assert response.json() == []
+
+
+def test_get_tasks_by_status_invalid(client):
+    response = client.get("/tasks/by-status/unknown_status")
+    assert response.status_code == 422
+
+
+# -----------------------------------
 # PAGINATION
 # -----------------------------------
 
@@ -273,7 +321,7 @@ def test_invalid_pagination(client):
 
 
 # -----------------------------------
-# FILTERING
+# FILTERING & SEARCH
 # -----------------------------------
 
 def test_filter_by_priority_and_category(client):
@@ -360,6 +408,70 @@ def test_invalid_status_filter(client):
     assert response.status_code == 422
 
 
+def test_search_tasks(client):
+    create_task(client, title="Mastering Angular Framework")
+    create_task(client, title="Simple grocery run")
+
+    response = client.get("/tasks", params={"q": "angular"})
+    assert response.status_code == 200
+
+    tasks = response.json()
+    assert len(tasks) == 1
+    assert "Angular" in tasks[0]["title"]
+
+
+def test_search_tasks_with_wildcards(client):
+    create_task(client, title="Achieve 100% test coverage")
+
+    response = client.get("/tasks", params={"q": "100%"})
+    assert response.status_code == 200
+
+    tasks = response.json()
+    assert len(tasks) == 1
+    assert "100%" in tasks[0]["title"]
+
+
+# -----------------------------------
+# DUE-DATE FILTERING & VALIDATION
+# -----------------------------------
+
+def test_due_date_filtering(client):
+    create_task(client, title="Past task", due_date="2026-01-10T10:00:00Z")
+    create_task(client, title="Future task", due_date="2026-12-25T10:00:00Z")
+
+    response = client.get(
+        "/tasks",
+        params={
+            "due_after": "2026-01-01T00:00:00Z",
+            "due_before": "2026-06-01T00:00:00Z"
+        }
+    )
+    assert response.status_code == 200
+
+    tasks = response.json()
+    assert len(tasks) == 1
+    assert tasks[0]["title"] == "Past task"
+
+
+def test_due_date_missing_timezone(client):
+    response = client.get(
+        "/tasks",
+        params={"due_after": "2026-01-01T00:00:00"}  # Naive datetime
+    )
+    assert response.status_code == 422
+
+
+def test_invalid_due_date_range(client):
+    response = client.get(
+        "/tasks",
+        params={
+            "due_after": "2026-12-01T00:00:00Z",
+            "due_before": "2026-01-01T00:00:00Z"  # due_after > due_before
+        }
+    )
+    assert response.status_code == 422
+
+
 # -----------------------------------
 # SORTING
 # -----------------------------------
@@ -399,3 +511,82 @@ def test_invalid_sort_field(client):
     )
 
     assert response.status_code == 422
+
+
+# -----------------------------------
+# ADDITIONAL REGRESSION TESTS
+# -----------------------------------
+
+def test_empty_task_stats(client):
+    response = client.get("/tasks/stats")
+
+    assert response.status_code == 200
+
+    data = response.json()
+    assert data["total"] == 0
+    assert data["overdue"] == 0
+    assert all(
+        count == 0
+        for count in data["by_status"].values()
+    )
+
+
+def test_stats_after_status_update(client):
+    task = create_task(
+        client,
+        title="Update statistics",
+        task_status="todo"
+    )
+
+    response = client.patch(
+        f"/tasks/{task['id']}",
+        json={"status": "completed"}
+    )
+
+    assert response.status_code == 200
+
+    stats = client.get("/tasks/stats").json()
+
+    assert stats["total"] == 1
+    assert stats["by_status"]["todo"] == 0
+    assert stats["by_status"]["completed"] == 1
+
+    kanban = client.get(
+        "/tasks/by-status/completed"
+    ).json()
+
+    assert any(t["id"] == task["id"] for t in kanban)
+
+
+def test_stats_after_delete(client):
+    task = create_task(
+        client,
+        title="Delete statistics"
+    )
+
+    response = client.delete(f"/tasks/{task['id']}")
+    assert response.status_code == 204
+
+    stats = client.get("/tasks/stats").json()
+
+    assert stats["total"] == 0
+    assert stats["by_status"]["todo"] == 0
+
+
+def test_due_date_timezone_equivalence(client):
+    create_task(
+        client,
+        title="Timezone example",
+        due_date="2026-11-20T12:00:00+02:00"
+    )
+
+    response = client.get(
+        "/tasks",
+        params={
+            "due_after": "2026-11-20T09:59:00Z",
+            "due_before": "2026-11-20T10:01:00Z"
+        }
+    )
+
+    assert response.status_code == 200
+    assert len(response.json()) == 1
