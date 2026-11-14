@@ -1,8 +1,7 @@
-
 from datetime import datetime, timezone
 from enum import Enum
 
-from pydantic import AwareDatetime, ConfigDict, field_validator
+from pydantic import AwareDatetime, ConfigDict, field_validator, BaseModel
 from sqlmodel import SQLModel, Field
 
 
@@ -46,6 +45,13 @@ class TaskBase(SQLModel):
     category: Category = Category.PERSONAL
 
     due_date: AwareDatetime | None = None
+
+    @field_validator("due_date")
+    @classmethod
+    def normalize_due_date(cls, value):
+        if value is None:
+            return None
+        return value.astimezone(timezone.utc)
 
 
 # -----------------------------------
@@ -98,6 +104,13 @@ class TaskUpdate(SQLModel):
     category: Category | None = None
     due_date: AwareDatetime | None = None
 
+    @field_validator("due_date")
+    @classmethod
+    def normalize_due_date(cls, value):
+        if value is None:
+            return None
+        return value.astimezone(timezone.utc)
+
     @field_validator(
         "title",
         "description",
@@ -113,10 +126,23 @@ class TaskUpdate(SQLModel):
 
 
 # -----------------------------------
-# 6. RESPONSE MODEL
+# 6. RESPONSE MODELS
 # -----------------------------------
 
 class TaskRead(TaskBase):
     id: int
     created_at: AwareDatetime
     updated_at: AwareDatetime
+
+
+class TaskStatusCounts(BaseModel):
+    todo: int = 0
+    in_progress: int = 0
+    completed: int = 0
+    archived: int = 0
+
+
+class TaskStatsRead(BaseModel):
+    total: int
+    by_status: TaskStatusCounts
+    overdue: int
