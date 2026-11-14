@@ -6,8 +6,10 @@ import type {
   Task,
   TaskCreate,
   TaskQueryParams,
+  TaskStatsModel,
   TaskUpdate,
 } from '../models/task.model';
+
 
 @Injectable({ providedIn: 'root' })
 export class TaskApiService {
@@ -41,4 +43,11 @@ export class TaskApiService {
   deleteTask(id: number): Observable<void> {
     return this.http.delete<void>(`${this.tasksUrl}/${id}`);
   }
+
+
+getTaskStats(): Observable<TaskStatsModel> {
+  return this.http.get<TaskStatsModel>(
+    `${this.tasksUrl}/stats`
+  );
+}
 }

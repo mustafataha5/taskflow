@@ -1,0 +1,40 @@
+<div
+  class="inline-flex items-center gap-1 rounded-xl
+         border border-slate-200 bg-slate-100 p-1
+         dark:border-slate-700 dark:bg-slate-800"
+  role="group"
+  aria-label="Task display mode"
+>
+  @for (option of views; track option.value) {
+    <button
+      type="button"
+      (click)="changeView(option.value)"
+      [attr.aria-pressed]="view() === option.value"
+      [class.bg-white]="view() === option.value"
+      [class.text-teal-600]="view() === option.value"
+      [class.shadow-sm]="view() === option.value"
+      class="inline-flex items-center gap-2 rounded-lg
+             px-3 py-2 text-sm font-medium
+             text-slate-600 transition-all
+             hover:text-teal-600
+             focus-visible:outline-2
+             focus-visible:outline-offset-2
+             focus-visible:outline-teal-500
+             dark:text-slate-300"
+    >
+      @switch (option.value) {
+        @case ('list') {
+          <span aria-hidden="true">☰</span>
+        }
+        @case ('table') {
+          <span aria-hidden="true">▦</span>
+        }
+        @case ('board') {
+          <span aria-hidden="true">▥</span>
+        }
+      }
+
+      {{ option.label }}
+    </button>
+  }
+</div>

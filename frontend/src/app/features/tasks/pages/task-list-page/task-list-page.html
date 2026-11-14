@@ -1,6 +1,6 @@
-<div class="mx-auto w-full max-w-7xl space-y-8 pb-12">
+<div class="mx-auto w-full max-w-7xl space-y-6 pb-12">
 
-  <!-- Page Header -->
+  <!-- 1. Page Header + New Task -->
   <header
     class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
   >
@@ -54,7 +54,7 @@
     </a>
   </header>
 
-  <!-- Error Banner with Retry -->
+  <!-- Task Store Error Banner with Retry -->
   @if (taskStore.error(); as errorMessage) {
     <div class="flex items-center justify-between rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-700 shadow-sm dark:border-red-900 dark:bg-red-950/50 dark:text-red-300">
       <span class="text-sm font-medium">{{ errorMessage }}</span>
@@ -67,30 +67,60 @@
     </div>
   }
 
-  <!-- Statistics Dashboard -->
-  <section aria-label="Task statistics">
-    <app-task-stats [tasks]="tasks()" />
+  <!-- 2. View Switcher -->
+  <section aria-label="Task view selection">
+    <div class="flex flex-wrap items-center justify-between gap-4
+                rounded-2xl border border-slate-200 bg-white p-4
+                shadow-sm dark:border-slate-700 dark:bg-slate-900">
+      <div>
+        <h2 class="text-sm font-semibold text-slate-900 dark:text-white">
+          Workspace View
+        </h2>
+        <p class="text-xs text-slate-500 dark:text-slate-400">
+          Choose how you want to organize tasks.
+        </p>
+      </div>
+
+      <app-task-view-switcher
+        [view]="currentView()"
+        (viewChange)="changeView($event)"
+      />
+    </div>
   </section>
 
-  <!-- Tasks Workspace -->
-  <section aria-label="Tasks workspace" class="space-y-5">
+  <!-- 3. Task Statistics -->
+  <section aria-label="Task statistics">
+    @if (statsLoading()) {
+      <div class="flex items-center justify-center rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+        <div class="flex items-center gap-3 text-teal-600 dark:text-teal-400">
+          <svg class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <span class="text-xs font-medium">Loading statistics...</span>
+        </div>
+      </div>
+    } @else if (statsError()) {
+      <div class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700 dark:border-amber-900 dark:bg-amber-950/50 dark:text-amber-300">
+        {{ statsError() }}
+      </div>
+    } @else if (stats(); as currentStats) {
+      <app-task-stats [statsData]="currentStats" />
+    }
+  </section>
 
-    <!-- Unified Toolbar -->
-    <div
-      class="rounded-2xl border border-slate-200/80 bg-white
-             p-5 shadow-sm dark:border-slate-700
-             dark:bg-slate-900"
-    >
-      <div
-        class="flex flex-col gap-5
-               xl:flex-row xl:items-end xl:justify-between"
-      >
-
+  <!-- 4. Filters — List and Table only -->
+  @if (currentView() !== 'board') {
+    <section aria-label="Task filters" class="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+      <div class="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
         <!-- Title & Task Counter -->
         <div class="flex shrink-0 flex-wrap items-center gap-3">
-
           <h2 class="text-lg font-bold text-slate-900 dark:text-white">
-            All Tasks
+            @if (currentView() === 'table') {
+              Task Table
+            } @else {
+              All Tasks
+            }
           </h2>
 
           <span
@@ -102,7 +132,6 @@
             <span class="h-1.5 w-1.5 rounded-full bg-teal-500"></span>
             {{ filteredTasks().length }} of {{ tasks().length }} tasks on this page
           </span>
-
         </div>
 
         <!-- Task Filters -->
@@ -112,11 +141,12 @@
             (filtersChange)="filters.set($event)"
           />
         </div>
-
       </div>
-    </div>
+    </section>
+  }
 
-    <!-- Loading Indicator or Task List / Empty State -->
+  <!-- 5. Dynamic Task View -->
+  <section aria-label="Task workspace">
     @if (taskStore.isLoading()) {
       <div class="flex flex-col items-center justify-center rounded-2xl border border-slate-200/80 bg-white py-16 dark:border-slate-700 dark:bg-slate-900">
         <div class="flex items-center gap-3 text-teal-600 dark:text-teal-400">
@@ -128,62 +158,87 @@
         </div>
       </div>
     } @else {
-      @if (filteredTasks().length > 0) {
-
-        <app-task-list
-          [tasks]="filteredTasks()"
-          (deleteTask)="onDeleteTask($event)"
-        />
-
-      } @else {
-
-        <!-- Empty Filter State -->
-        <div
-          class="flex flex-col items-center justify-center
-                 rounded-2xl border border-dashed border-slate-300
-                 bg-white p-10 text-center sm:p-14
-                 dark:border-slate-700 dark:bg-slate-900"
-        >
-
-          <div
-            class="flex h-14 w-14 items-center justify-center
-                   rounded-2xl bg-teal-50 text-teal-500
-                   dark:bg-teal-500/10 dark:text-teal-400"
-          >
-            <svg
-              class="h-7 w-7"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              stroke-width="1.6"
-              aria-hidden="true"
+      @switch (currentView()) {
+        @case ('list') {
+          @if (filteredTasks().length > 0) {
+            <app-task-list
+              [tasks]="filteredTasks()"
+              (deleteTask)="onDeleteTask($event)"
+            />
+          } @else {
+            <!-- Smart Empty State -->
+            <div
+              class="flex flex-col items-center justify-center
+                     rounded-2xl border border-dashed border-slate-300
+                     bg-white p-10 text-center sm:p-14
+                     dark:border-slate-700 dark:bg-slate-900"
             >
-              <circle cx="11" cy="11" r="7" />
-              <path stroke-linecap="round" d="m20 20-4-4" />
-            </svg>
+              <div
+                class="flex h-14 w-14 items-center justify-center
+                       rounded-2xl bg-teal-50 text-teal-500
+                       dark:bg-teal-500/10 dark:text-teal-400"
+              >
+                <svg
+                  class="h-7 w-7"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.6"
+                  aria-hidden="true"
+                >
+                  <circle cx="11" cy="11" r="7" />
+                  <path stroke-linecap="round" d="m20 20-4-4" />
+                </svg>
+              </div>
+
+              <h3
+                class="mt-5 text-base font-semibold
+                       text-slate-900 dark:text-white"
+              >
+                @if (tasks().length === 0) {
+                  No tasks yet
+                } @else {
+                  No tasks match your filters
+                }
+              </h3>
+
+              <p
+                class="mt-2 max-w-sm text-sm
+                       text-slate-500 dark:text-slate-400"
+              >
+                @if (tasks().length === 0) {
+                  Create your first task to start organizing your work.
+                } @else {
+                  Try adjusting your filters to see more tasks.
+                }
+              </p>
+            </div>
+          }
+        }
+
+        @case ('table') {
+          <div class="rounded-2xl border border-slate-200
+                      bg-white p-10 text-center
+                      text-slate-500 dark:border-slate-700
+                      dark:bg-slate-900 dark:text-slate-400">
+            Table view coming next.
           </div>
+        }
 
-          <h3
-            class="mt-5 text-base font-semibold
-                   text-slate-900 dark:text-white"
-          >
-            No tasks match your criteria
-          </h3>
-
-          <p
-            class="mt-2 max-w-sm text-sm
-                   text-slate-500 dark:text-slate-400"
-          >
-            Try changing your status, priority, or category filters
-            to find more tasks.
-          </p>
-
-        </div>
-
+        @case ('board') {
+          <div class="rounded-2xl border border-slate-200
+                      bg-white p-10 text-center
+                      text-slate-500 dark:border-slate-700
+                      dark:bg-slate-900 dark:text-slate-400">
+            Kanban board coming next.
+          </div>
+        }
       }
     }
+  </section>
 
-    <!-- Pagination Controls -->
+  <!-- 6. Pagination — List and Table only -->
+  @if (currentView() !== 'board') {
     <nav aria-label="Task pagination" class="flex items-center justify-center gap-4 pt-2">
       <button
         type="button"
@@ -209,7 +264,6 @@
         Next
       </button>
     </nav>
-
-  </section>
+  }
 
 </div>
