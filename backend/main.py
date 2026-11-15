@@ -130,7 +130,7 @@ def get_tasks_by_status(
 def get_tasks(
     session: SessionDep,
     page: Annotated[int, Query(ge=1)] = 1,
-    page_size: Annotated[int, Query(ge=1, le=100)] = 10,
+    page_size: Annotated[int, Query(ge=1, le=100)] = 12,
     priority: Priority | None = None,
     category: Category | None = None,
     task_status: Status | None = Query(default=None, alias="status"),

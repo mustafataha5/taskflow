@@ -1,0 +1,331 @@
+
+<!-- KANBAN BOARD -->
+<div
+  cdkDropListGroup
+  class="w-full min-w-0 overflow-x-auto pb-5"
+  aria-label="Task Kanban board"
+>
+  <div class="flex min-w-max items-start gap-4">
+
+    @for (col of columns; track col.status) {
+
+      <!-- COLUMN -->
+      <section
+        [attr.aria-label]="col.label + ' tasks'"
+        class="flex w-[280px] shrink-0 flex-col
+               rounded-2xl border border-slate-200/80
+               bg-slate-50/80 p-3
+               dark:border-slate-700/70
+               dark:bg-slate-800/30
+               sm:w-[300px] xl:w-[310px]"
+      >
+
+        <!-- COLUMN HEADER -->
+        <header
+          class="mb-3 flex items-center justify-between
+                 border-b border-slate-200/80
+                 px-1 pb-3 dark:border-slate-700/70"
+        >
+
+          <div class="flex items-center gap-2.5">
+            <span
+              class="h-2.5 w-2.5 rounded-full"
+              [class]="col.dotClass"
+            ></span>
+
+            <h3
+              class="text-sm font-bold text-slate-800
+                     dark:text-slate-100"
+            >
+              {{ col.label }}
+            </h3>
+          </div>
+
+          <span
+            class="rounded-lg bg-white px-2.5 py-1
+                   text-xs font-semibold tabular-nums
+                   text-slate-600 shadow-sm
+                   ring-1 ring-slate-200
+                   dark:bg-slate-800 dark:text-slate-300
+                   dark:ring-slate-700"
+            [attr.aria-label]="
+              groupedTasks()[col.status].length +
+              ' tasks in ' + col.label
+            "
+          >
+            {{ groupedTasks()[col.status].length }}
+          </span>
+
+        </header>
+
+        <!-- DROP ZONE -->
+        <div
+          cdkDropList
+          [cdkDropListData]="groupedTasks()[col.status]"
+          (cdkDropListDropped)="drop($event, col.status)"
+          class="kanban-drop-zone flex min-h-[280px]
+                 flex-col gap-3 rounded-xl
+                 p-1 transition-colors"
+        >
+
+          @for (
+            task of groupedTasks()[col.status];
+            track task.id
+          ) {
+
+            <!-- TASK CARD -->
+            <article
+              cdkDrag
+              [cdkDragData]="task"
+              class="group relative flex flex-col
+                     rounded-xl border border-slate-200/80
+                     bg-white p-4 shadow-sm
+                     transition-[border-color,box-shadow]
+                     duration-150
+                     hover:border-teal-400/60
+                     hover:shadow-md
+                     dark:border-slate-700
+                     dark:bg-slate-900
+                     dark:hover:border-teal-500/60"
+            >
+
+              <!-- CARD HEADER -->
+              <div
+                class="mb-3 flex items-center
+                       justify-between gap-2"
+              >
+
+                <!-- PRIORITY BADGE -->
+                <span
+                  class="inline-flex items-center
+                         rounded-md px-2.5 py-1
+                         text-[11px] font-semibold
+                         capitalize"
+                  [class]="priorityStyles[task.priority]"
+                >
+                  {{ task.priority }}
+                </span>
+
+                <!-- DRAG HANDLE -->
+                <button
+                  type="button"
+                  cdkDragHandle
+                  [attr.aria-label]="
+                    'Drag ' + task.title
+                  "
+                  title="Move task"
+                  class="flex h-8 w-8 cursor-grab
+                         items-center justify-center
+                         rounded-lg text-slate-400
+                         transition-colors
+                         hover:bg-slate-100
+                         hover:text-teal-600
+                         active:cursor-grabbing
+                         focus-visible:outline-2
+                         focus-visible:outline-teal-500
+                         dark:hover:bg-slate-800"
+                >
+
+                  <svg
+                    class="h-4 w-4"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    aria-hidden="true"
+                  >
+                    <circle cx="9" cy="5" r="1" />
+                    <circle cx="15" cy="5" r="1" />
+                    <circle cx="9" cy="12" r="1" />
+                    <circle cx="15" cy="12" r="1" />
+                    <circle cx="9" cy="19" r="1" />
+                    <circle cx="15" cy="19" r="1" />
+                  </svg>
+
+                </button>
+
+              </div>
+
+              <!-- TASK TITLE -->
+              <a
+                [routerLink]="['/tasks', task.id]"
+                class="mb-1.5 block text-sm font-semibold
+                       leading-5 text-slate-900
+                       transition-colors
+                       hover:text-teal-600
+                       focus-visible:rounded
+                       focus-visible:outline-2
+                       focus-visible:outline-teal-500
+                       dark:text-white
+                       dark:hover:text-teal-400"
+              >
+                {{ task.title }}
+              </a>
+
+              <!-- DESCRIPTION -->
+              @if (task.description) {
+                <p
+                  class="mb-3 line-clamp-2 break-words
+                         text-xs leading-5 text-slate-500
+                         dark:text-slate-400"
+                >
+                  {{ task.description }}
+                </p>
+              }
+
+              <!-- CATEGORY -->
+              <div class="mb-3">
+                <span
+                  class="inline-flex rounded-md
+                         bg-slate-100 px-2 py-1
+                         text-[11px] font-medium capitalize
+                         text-slate-600
+                         dark:bg-slate-800
+                         dark:text-slate-300"
+                >
+                  {{ task.category }}
+                </span>
+              </div>
+
+              <!-- CARD FOOTER -->
+              <footer
+                class="mt-auto flex items-center
+                       justify-between gap-2
+                       border-t border-slate-100
+                       pt-3 dark:border-slate-800"
+              >
+
+                <!-- DUE DATE -->
+                <div
+                  class="flex min-w-0 items-center gap-1.5
+                         text-xs text-slate-500
+                         dark:text-slate-400"
+                >
+
+                  <svg
+                    class="h-3.5 w-3.5 shrink-0"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.7"
+                    aria-hidden="true"
+                  >
+                    <rect
+                      x="3"
+                      y="5"
+                      width="18"
+                      height="16"
+                      rx="2"
+                    />
+                    <path
+                      d="M16 3v4M8 3v4M3 10h18"
+                    />
+                  </svg>
+
+                  @if (task.due_date) {
+                    <span>
+                      {{ task.due_date | date:'MMM d, y':'UTC' }}
+                    </span>
+                  } @else {
+                    <span>No due date</span>
+                  }
+
+                </div>
+
+                <!-- ACTIONS -->
+                <div class="flex shrink-0 items-center gap-3">
+
+                  <a
+                    [routerLink]="['/tasks', task.id]"
+                    class="text-xs font-semibold
+                           text-teal-600 hover:underline
+                           focus-visible:outline-2
+                           focus-visible:outline-teal-500
+                           dark:text-teal-400"
+                  >
+                    View
+                  </a>
+
+                  <button
+                    type="button"
+                    (click)="deleteTask.emit(task.id)"
+                    [attr.aria-label]="
+                      'Delete ' + task.title
+                    "
+                    class="text-xs font-semibold
+                           text-red-500 hover:underline
+                           focus-visible:outline-2
+                           focus-visible:outline-red-500
+                           dark:text-red-400"
+                  >
+                    Delete
+                  </button>
+
+                </div>
+
+              </footer>
+
+            </article>
+
+          } @empty {
+
+            <!-- EMPTY COLUMN -->
+            <div
+              class="flex min-h-[180px] flex-col
+                     items-center justify-center
+                     rounded-xl border-2 border-dashed
+                     border-slate-200 px-4 py-8
+                     text-center
+                     dark:border-slate-700"
+            >
+
+              <svg
+                class="mb-3 h-8 w-8 text-slate-300
+                       dark:text-slate-600"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                aria-hidden="true"
+              >
+                <rect
+                  x="4"
+                  y="4"
+                  width="16"
+                  height="16"
+                  rx="3"
+                />
+                <path
+                  d="M12 8v8M8 12h8"
+                  stroke-linecap="round"
+                />
+              </svg>
+
+              <p
+                class="text-xs font-medium
+                       text-slate-500
+                       dark:text-slate-400"
+              >
+                No tasks yet
+              </p>
+
+              <p
+                class="mt-1 text-[11px]
+                       text-slate-400
+                       dark:text-slate-500"
+              >
+                Drag a task here
+              </p>
+
+            </div>
+
+          }
+
+        </div>
+
+      </section>
+
+    }
+
+  </div>
+</div>
