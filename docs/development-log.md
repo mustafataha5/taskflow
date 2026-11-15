@@ -1,43 +1,35 @@
-# TaskFlow — Development Log
-
-## November 15, 2026 — Documentation and Task Views
+## November 15, 2026 — Task Views and Kanban Drag-and-Drop
 
 **Branch:** `feature/task-views`
 
-### Objectives
+### Completed
 
-- [ ] Establish project documentation.
-- [ ] Implement backend statistics endpoints.
-- [ ] Add support for retrieving tasks grouped by status.
-- [ ] Build an Angular view switcher.
-- [ ] Implement a table view.
-- [ ] Implement a Kanban board.
-- [ ] Test the new functionality.
-- [ ] Update the README.
-- [ ] Open a GitHub pull request.
+- [x] Implemented Angular Task Table view.
+- [x] Implemented Kanban Board with four status columns.
+- [x] Integrated unpaginated Kanban data from FastAPI.
+- [x] Implemented Angular CDK drag-and-drop.
+- [x] Added optimistic task status updates with API persistence.
+- [x] Added deletion confirmation across all task views.
+- [x] Changed the default pagination size to 12.
+- [x] Corrected Next button pagination behavior.
+- [x] Added contextual loading and error states.
+- [x] Improved task and statistics retry handling.
+- [x] Improved responsive Kanban layout and accessibility.
 
-### Existing Functionality
+### Architecture Decisions
 
-- FastAPI task CRUD.
-- SQLite database integration.
-- Angular task listing and filtering.
-- Angular reactive forms.
-- Task details, editing, and deletion.
-- Frontend-to-backend API integration.
-- Pagination support.
+- List and Table share paginated task state.
+- Kanban maintains separate unpaginated task state.
+- Angular signals manage state and derived values.
+- RxJS `forkJoin` retrieves tasks across four statuses.
+- TaskStoreService coordinates API updates and refreshes.
+- Kanban components emit events rather than directly calling HTTP APIs.
+- Dragging between columns changes task status.
+- Ordering within a column is not persisted in V1.
 
-### Technical Decisions
+### Next Steps
 
-1. Continue using Angular signals for frontend state.
-2. Keep components reusable and responsibilities separated.
-3. Implement the initial Kanban board without drag-and-drop.
-4. Introduce drag-and-drop after the three task views work correctly.
-5. Add authentication after the core V1 functionality is stable.
-
-### Implementation Notes
-
-Record important implementation details, bugs, fixes, tests, and design decisions here as development progresses.
-
-### End-of-Day Summary
-
-To be completed after implementation and testing.
+- Add automated frontend tests.
+- Refine drag-and-drop error notifications.
+- Complete final V1 testing and documentation.
+- Review readiness for the V1 release.
