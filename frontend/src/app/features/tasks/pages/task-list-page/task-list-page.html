@@ -1,24 +1,26 @@
 <div class="mx-auto w-full max-w-7xl space-y-6 pb-12">
 
-  <!-- 1. Page Header + New Task -->
-  <header
-    class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
-  >
+  <!-- ===================================== -->
+  <!-- 1. PAGE HEADER -->
+  <!-- ===================================== -->
+
+  <header class="flex flex-col gap-4 sm:flex-row
+           sm:items-center sm:justify-between">
     <div class="space-y-1">
       <div class="flex flex-wrap items-center gap-3">
-        <h1
-          class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white"
-        >
+
+        <h1 class="text-3xl font-bold tracking-tight
+                 text-slate-900 dark:text-white">
           TaskFlow
         </h1>
 
-        <span
-          class="inline-flex items-center rounded-full bg-teal-500/10
-                 px-2.5 py-0.5 text-xs font-semibold text-teal-600
-                 dark:bg-teal-400/10 dark:text-teal-400"
-        >
+        <span class="inline-flex items-center rounded-full
+                 bg-teal-500/10 px-2.5 py-0.5
+                 text-xs font-semibold text-teal-600
+                 dark:bg-teal-400/10 dark:text-teal-400">
           Workspace
         </span>
+
       </div>
 
       <p class="text-sm text-slate-500 dark:text-slate-400">
@@ -26,244 +28,456 @@
       </p>
     </div>
 
-    <!-- New Task Button -->
-    <a
-      routerLink="/tasks/new"
-      class="inline-flex shrink-0 items-center justify-center gap-2
-             rounded-xl bg-gradient-to-r from-teal-500 to-emerald-500
-             px-5 py-2.5 text-sm font-semibold text-white
-             shadow-md shadow-teal-500/20 transition-all
-             hover:opacity-95 hover:shadow-lg hover:shadow-teal-500/30
-             active:scale-[0.98] focus-visible:outline-2
-             focus-visible:outline-offset-2 focus-visible:outline-teal-500"
-    >
-      <svg
-        class="h-4 w-4 stroke-[2.5]"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-        aria-hidden="true"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M12 4v16m8-8H4"
-        />
+    <a routerLink="/tasks/new" class="inline-flex shrink-0 items-center justify-center
+             gap-2 rounded-xl bg-gradient-to-r
+             from-teal-500 to-emerald-500 px-5 py-2.5
+             text-sm font-semibold text-white
+             shadow-md shadow-teal-500/20
+             transition-all hover:opacity-95
+             hover:shadow-lg hover:shadow-teal-500/30
+             active:scale-[0.98]
+             focus-visible:outline-2
+             focus-visible:outline-offset-2
+             focus-visible:outline-teal-500">
+      <svg class="h-4 w-4 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
       </svg>
+
       New Task
     </a>
   </header>
 
-  <!-- Task Store Error Banner with Retry -->
-  @if (taskStore.error(); as errorMessage) {
-    <div class="flex items-center justify-between rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-700 shadow-sm dark:border-red-900 dark:bg-red-950/50 dark:text-red-300">
-      <span class="text-sm font-medium">{{ errorMessage }}</span>
-      <button 
-        (click)="taskStore.retryLoad()" 
-        class="ml-4 shrink-0 rounded-lg px-3 py-1 text-sm font-semibold underline hover:bg-red-100 dark:hover:bg-red-900/50"
-      >
-        Retry
-      </button>
-    </div>
-  }
 
-  <!-- 2. View Switcher -->
+  <!-- ===================================== -->
+  <!-- 2. VIEW SWITCHER -->
+  <!-- ===================================== -->
+
   <section aria-label="Task view selection">
-    <div class="flex flex-wrap items-center justify-between gap-4
-                rounded-2xl border border-slate-200 bg-white p-4
-                shadow-sm dark:border-slate-700 dark:bg-slate-900">
+
+    <div class="flex flex-wrap items-center justify-between
+             gap-4 rounded-2xl border
+             border-slate-200 bg-white p-4
+             shadow-sm dark:border-slate-700
+             dark:bg-slate-900">
       <div>
-        <h2 class="text-sm font-semibold text-slate-900 dark:text-white">
+        <h2 class="text-sm font-semibold
+                 text-slate-900 dark:text-white">
           Workspace View
         </h2>
+
         <p class="text-xs text-slate-500 dark:text-slate-400">
           Choose how you want to organize tasks.
         </p>
       </div>
 
-      <app-task-view-switcher
-        [view]="currentView()"
-        (viewChange)="changeView($event)"
-      />
+      <app-task-view-switcher [view]="currentView()" (viewChange)="changeView($event)" />
+    </div>
+
+  </section>
+
+
+  <!-- ===================================== -->
+  <!-- 3. DATABASE STATISTICS -->
+  <!-- ===================================== -->
+
+  <section aria-label="Task statistics">
+
+    @if (statsLoading()) {
+
+    <div class="flex items-center justify-center
+               rounded-2xl border border-slate-200/80
+               bg-white p-6 shadow-sm
+               dark:border-slate-700 dark:bg-slate-900">
+      <div role="status" class="flex items-center gap-3
+                 text-teal-600 dark:text-teal-400">
+        <svg class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+          </path>
+        </svg>
+
+        <span class="text-xs font-medium">
+          Loading statistics...
+        </span>
+      </div>
+    </div>
+
+    } @else if (statsError()) {
+
+    <div role="alert" class="rounded-xl border border-amber-200
+               bg-amber-50 px-4 py-3
+               text-sm text-amber-700
+               dark:border-amber-900
+               dark:bg-amber-950/50
+               dark:text-amber-300">
+      {{ statsError() }}
+    </div>
+
+    } @else if (stats(); as currentStats) {
+
+    <app-task-stats [statsData]="currentStats" />
+
+    }
+
+  </section>
+
+
+  <!-- ===================================== -->
+  <!-- 4. FILTERS — LIST AND TABLE ONLY -->
+  <!-- ===================================== -->
+
+  @if (currentView() !== 'board') {
+
+  <section aria-label="Task filters" class="rounded-2xl border border-slate-200/80
+             bg-white p-5 shadow-sm
+             dark:border-slate-700 dark:bg-slate-900">
+    <div class="flex flex-col gap-5 xl:flex-row
+               xl:items-end xl:justify-between">
+
+      <div class="flex shrink-0 flex-wrap items-center gap-3">
+
+        <h2 class="text-lg font-bold
+                   text-slate-900 dark:text-white">
+          @if (currentView() === 'table') {
+          Task Table
+          } @else {
+          All Tasks
+          }
+        </h2>
+
+        <span class="inline-flex items-center gap-2 rounded-full
+                   bg-slate-100 px-3 py-1 text-xs
+                   font-semibold text-slate-600
+                   dark:bg-slate-800 dark:text-slate-300">
+          <span class="h-1.5 w-1.5 rounded-full bg-teal-500"></span>
+
+          {{ filteredTasks().length }}
+          of
+          {{ tasks().length }}
+          tasks on this page
+        </span>
+
+      </div>
+
+      <div class="w-full min-w-0 xl:max-w-2xl">
+        <app-task-filter [filters]="filters()" (filtersChange)="filters.set($event)" />
+      </div>
+
     </div>
   </section>
 
-  <!-- 3. Task Statistics -->
-  <section aria-label="Task statistics">
-    @if (statsLoading()) {
-      <div class="flex items-center justify-center rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900">
-        <div class="flex items-center gap-3 text-teal-600 dark:text-teal-400">
-          <svg class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-          <span class="text-xs font-medium">Loading statistics...</span>
-        </div>
-      </div>
-    } @else if (statsError()) {
-      <div class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700 dark:border-amber-900 dark:bg-amber-950/50 dark:text-amber-300">
-        {{ statsError() }}
-      </div>
-    } @else if (stats(); as currentStats) {
-      <app-task-stats [statsData]="currentStats" />
-    }
-  </section>
-
-  <!-- 4. Filters — List and Table only -->
-  @if (currentView() !== 'board') {
-    <section aria-label="Task filters" class="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
-      <div class="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
-        <!-- Title & Task Counter -->
-        <div class="flex shrink-0 flex-wrap items-center gap-3">
-          <h2 class="text-lg font-bold text-slate-900 dark:text-white">
-            @if (currentView() === 'table') {
-              Task Table
-            } @else {
-              All Tasks
-            }
-          </h2>
-
-          <span
-            class="inline-flex items-center gap-2 rounded-full
-                   bg-slate-100 px-3 py-1 text-xs font-semibold
-                   text-slate-600 dark:bg-slate-800
-                   dark:text-slate-300"
-          >
-            <span class="h-1.5 w-1.5 rounded-full bg-teal-500"></span>
-            {{ filteredTasks().length }} of {{ tasks().length }} tasks on this page
-          </span>
-        </div>
-
-        <!-- Task Filters -->
-        <div class="w-full min-w-0 xl:max-w-2xl">
-          <app-task-filter
-            [filters]="filters()"
-            (filtersChange)="filters.set($event)"
-          />
-        </div>
-      </div>
-    </section>
   }
 
-  <!-- 5. Dynamic Task View -->
+
+  <!-- ===================================== -->
+  <!-- 5. DYNAMIC TASK WORKSPACE -->
+  <!-- ===================================== -->
+
   <section aria-label="Task workspace">
+
+    @switch (currentView()) {
+
+    <!-- =============================== -->
+    <!-- LIST VIEW -->
+    <!-- =============================== -->
+
+    @case ('list') {
+
     @if (taskStore.isLoading()) {
-      <div class="flex flex-col items-center justify-center rounded-2xl border border-slate-200/80 bg-white py-16 dark:border-slate-700 dark:bg-slate-900">
-        <div class="flex items-center gap-3 text-teal-600 dark:text-teal-400">
-          <svg class="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-          <span class="text-sm font-medium animate-pulse">Loading tasks from server...</span>
-        </div>
+
+    <!-- Loading State -->
+
+    <div role="status" class="flex items-center justify-center gap-3
+                   rounded-2xl border border-slate-200/80
+                   bg-white py-16 text-teal-600
+                   dark:border-slate-700 dark:bg-slate-900
+                   dark:text-teal-400">
+      <svg class="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor"
+          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+        </path>
+      </svg>
+
+      <span class="text-sm font-medium">
+        Loading tasks from server...
+      </span>
+    </div>
+
+    } @else if (taskStore.error(); as errorMessage) {
+
+    <!-- Error State -->
+
+    <div role="alert" class="flex flex-col items-center justify-center
+                   rounded-2xl border border-red-200
+                   bg-red-50/50 px-6 py-14 text-center
+                   dark:border-red-900/60
+                   dark:bg-red-950/20">
+      <div class="mb-4 flex h-14 w-14 items-center
+                     justify-center rounded-2xl
+                     bg-red-100 text-red-600
+                     dark:bg-red-900/40 dark:text-red-400">
+        <svg class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"
+          aria-hidden="true">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path stroke-linecap="round" d="M12 7v6m0 4h.01"></path>
+        </svg>
       </div>
+
+      <h3 class="text-lg font-semibold
+                     text-slate-900 dark:text-white">
+        Unable to load tasks
+      </h3>
+
+      <p class="mt-2 max-w-md text-sm
+                     text-slate-600 dark:text-slate-400">
+        {{ errorMessage }}
+      </p>
+
+      <button type="button" (click)="retryTasks()" class="mt-6 inline-flex items-center
+                     justify-center rounded-xl
+                     bg-teal-600 px-5 py-2.5
+                     text-sm font-semibold text-white
+                     transition-colors hover:bg-teal-700
+                     focus-visible:outline-2
+                     focus-visible:outline-offset-2
+                     focus-visible:outline-teal-500">
+        Try Again
+      </button>
+    </div>
+
+    } @else if (filteredTasks().length > 0) {
+
+    <app-task-list [tasks]="filteredTasks()" (deleteTask)="onDeleteTask($event)" />
+
     } @else {
-      @switch (currentView()) {
-        @case ('list') {
-          @if (filteredTasks().length > 0) {
-            <app-task-list
-              [tasks]="filteredTasks()"
-              (deleteTask)="onDeleteTask($event)"
-            />
-          } @else {
-            <!-- Smart Empty State -->
-            <div
-              class="flex flex-col items-center justify-center
-                     rounded-2xl border border-dashed border-slate-300
-                     bg-white p-10 text-center sm:p-14
-                     dark:border-slate-700 dark:bg-slate-900"
-            >
-              <div
-                class="flex h-14 w-14 items-center justify-center
-                       rounded-2xl bg-teal-50 text-teal-500
-                       dark:bg-teal-500/10 dark:text-teal-400"
-              >
-                <svg
-                  class="h-7 w-7"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.6"
-                  aria-hidden="true"
-                >
-                  <circle cx="11" cy="11" r="7" />
-                  <path stroke-linecap="round" d="m20 20-4-4" />
-                </svg>
-              </div>
 
-              <h3
-                class="mt-5 text-base font-semibold
-                       text-slate-900 dark:text-white"
-              >
-                @if (tasks().length === 0) {
-                  No tasks yet
-                } @else {
-                  No tasks match your filters
-                }
-              </h3>
+    <!-- Empty State -->
 
-              <p
-                class="mt-2 max-w-sm text-sm
-                       text-slate-500 dark:text-slate-400"
-              >
-                @if (tasks().length === 0) {
-                  Create your first task to start organizing your work.
-                } @else {
-                  Try adjusting your filters to see more tasks.
-                }
-              </p>
-            </div>
-          }
+    <div class="flex flex-col items-center justify-center
+                   rounded-2xl border border-dashed
+                   border-slate-300 bg-white p-10
+                   text-center sm:p-14
+                   dark:border-slate-700 dark:bg-slate-900">
+      <div class="flex h-14 w-14 items-center justify-center
+                     rounded-2xl bg-teal-50 text-teal-500
+                     dark:bg-teal-500/10 dark:text-teal-400">
+        <svg class="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.6"
+          aria-hidden="true">
+          <circle cx="11" cy="11" r="7"></circle>
+          <path stroke-linecap="round" d="m20 20-4-4"></path>
+        </svg>
+      </div>
+
+      <h3 class="mt-5 text-base font-semibold
+                     text-slate-900 dark:text-white">
+        @if (tasks().length === 0) {
+        No tasks yet
+        } @else {
+        No tasks match your filters
         }
+      </h3>
 
-        @case ('table') {
-          <div class="rounded-2xl border border-slate-200
-                      bg-white p-10 text-center
-                      text-slate-500 dark:border-slate-700
-                      dark:bg-slate-900 dark:text-slate-400">
-            Table view coming next.
-          </div>
+      <p class="mt-2 max-w-sm text-sm
+                     text-slate-500 dark:text-slate-400">
+        @if (tasks().length === 0) {
+        Create your first task to start organizing your work.
+        } @else {
+        Try adjusting your filters to see more tasks.
         }
+      </p>
+    </div>
 
-        @case ('board') {
-          <div class="rounded-2xl border border-slate-200
-                      bg-white p-10 text-center
-                      text-slate-500 dark:border-slate-700
-                      dark:bg-slate-900 dark:text-slate-400">
-            Kanban board coming next.
-          </div>
-        }
-      }
     }
+
+    }
+
+
+    <!-- =============================== -->
+    <!-- TABLE VIEW -->
+    <!-- =============================== -->
+
+    @case ('table') {
+
+    @if (taskStore.isLoading()) {
+
+    <div role="status" class="flex items-center justify-center
+                   rounded-2xl border border-slate-200
+                   bg-white py-16 text-teal-600
+                   dark:border-slate-700 dark:bg-slate-900
+                   dark:text-teal-400">
+      <svg class="mr-3 h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor"
+          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+        </path>
+      </svg>
+
+      <span class="text-sm font-medium">
+        Loading tasks from server...
+      </span>
+    </div>
+
+    } @else if (taskStore.error(); as errorMessage) {
+
+    <div role="alert" class="flex flex-col items-center justify-center
+                   rounded-2xl border border-red-200
+                   bg-red-50/50 px-6 py-14 text-center
+                   dark:border-red-900/60
+                   dark:bg-red-950/20">
+      <div class="mb-4 flex h-14 w-14 items-center
+                     justify-center rounded-2xl
+                     bg-red-100 text-red-600
+                     dark:bg-red-900/40 dark:text-red-400">
+        <svg class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"
+          aria-hidden="true">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path stroke-linecap="round" d="M12 7v6m0 4h.01"></path>
+        </svg>
+      </div>
+
+      <h3 class="text-lg font-semibold
+                     text-slate-900 dark:text-white">
+        Unable to load tasks
+      </h3>
+
+      <p class="mt-2 max-w-md text-sm
+                     text-slate-600 dark:text-slate-400">
+        {{ errorMessage }}
+      </p>
+
+      <button type="button" (click)="retryTasks()" class="mt-6 rounded-xl bg-teal-600
+                     px-5 py-2.5 text-sm font-semibold
+                     text-white transition-colors
+                     hover:bg-teal-700
+                     focus-visible:outline-2
+                     focus-visible:outline-offset-2
+                     focus-visible:outline-teal-500">
+        Try Again
+      </button>
+    </div>
+
+    } @else {
+
+    <app-task-table [tasks]="filteredTasks()" (deleteTask)="onDeleteTask($event)" />
+
+    }
+
+    }
+
+
+    <!-- =============================== -->
+    <!-- KANBAN BOARD VIEW -->
+    <!-- =============================== -->
+
+    @case ('board') {
+
+    @if (taskStore.isBoardLoading()) {
+
+    <div role="status" class="flex items-center justify-center
+                   rounded-2xl border border-slate-200
+                   bg-white py-16 text-teal-600
+                   dark:border-slate-700 dark:bg-slate-900
+                   dark:text-teal-400">
+      <svg class="mr-3 h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor"
+          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+        </path>
+      </svg>
+
+      <span class="text-sm font-medium">
+        Loading Kanban board...
+      </span>
+    </div>
+
+    } @else if (taskStore.boardError(); as boardError) {
+
+    <div role="alert" class="flex flex-col items-center justify-center
+                   rounded-2xl border border-red-200
+                   bg-red-50/50 px-6 py-14 text-center
+                   dark:border-red-900/60
+                   dark:bg-red-950/20">
+      <div class="mb-4 flex h-14 w-14 items-center
+                     justify-center rounded-2xl
+                     bg-red-100 text-red-600
+                     dark:bg-red-900/40 dark:text-red-400">
+        <svg class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"
+          aria-hidden="true">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path stroke-linecap="round" d="M12 7v6m0 4h.01"></path>
+        </svg>
+      </div>
+
+      <h3 class="text-lg font-semibold
+                     text-slate-900 dark:text-white">
+        Unable to load Kanban board
+      </h3>
+
+      <p class="mt-2 max-w-md text-sm
+                     text-slate-600 dark:text-slate-400">
+        {{ boardError }}
+      </p>
+
+      <button type="button" (click)="taskStore.loadAllTasks()" class="mt-6 rounded-xl bg-teal-600
+                     px-5 py-2.5 text-sm font-semibold
+                     text-white transition-colors
+                     hover:bg-teal-700
+                     focus-visible:outline-2
+                     focus-visible:outline-offset-2
+                     focus-visible:outline-teal-500">
+        Try Again
+      </button>
+    </div>
+
+    } @else {
+    <app-task-kanban [tasks]="boardTasks()" (deleteTask)="onDeleteTask($event)"
+      (statusChanged)="onStatusChanged($event)" />
+    <!-- <app-task-kanban
+            [tasks]="boardTasks()"
+            (deleteTask)="onDeleteTask($event)"
+          /> -->
+
+    }
+
+    }
+
+    }
+
   </section>
 
-  <!-- 6. Pagination — List and Table only -->
-  @if (currentView() !== 'board') {
-    <nav aria-label="Task pagination" class="flex items-center justify-center gap-4 pt-2">
-      <button
-        type="button"
-        class="rounded-lg border border-slate-300 px-3 py-2 text-sm
-               disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:text-slate-200"
-        [disabled]="taskStore.isLoading() || taskStore.page() === 1"
-        (click)="goToPage(taskStore.page() - 1)"
-      >
-        Previous
-      </button>
 
-      <span aria-live="polite" class="text-sm text-slate-600 dark:text-slate-300">
-        Page {{ taskStore.page() }}
-      </span>
+  <!-- ===================================== -->
+  <!-- 6. PAGINATION — LIST AND TABLE ONLY -->
+  <!-- ===================================== -->
 
-      <button
-        type="button"
-        class="rounded-lg border border-slate-300 px-3 py-2 text-sm
-               disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:text-slate-200"
-        [disabled]="taskStore.isLoading() || !taskStore.canGoNext()"
-        (click)="goToPage(taskStore.page() + 1)"
-      >
-        Next
-      </button>
-    </nav>
+  @if (currentView() !== 'board' && !taskStore.error()) {
+
+  <nav aria-label="Task pagination" class="flex items-center justify-center gap-4 pt-2">
+    <button type="button" class="rounded-lg border border-slate-300
+               px-3 py-2 text-sm
+               disabled:cursor-not-allowed
+               disabled:opacity-40
+               dark:border-slate-700 dark:text-slate-200" [disabled]="taskStore.isLoading() || taskStore.page() === 1"
+      (click)="goToPage(taskStore.page() - 1)">
+      Previous
+    </button>
+
+    <span aria-live="polite" class="text-sm text-slate-600 dark:text-slate-300">
+      Page {{ taskStore.page() }}
+    </span>
+
+    <button type="button" class="rounded-lg border border-slate-300
+               px-3 py-2 text-sm
+               disabled:cursor-not-allowed
+               disabled:opacity-40
+               dark:border-slate-700 dark:text-slate-200" [disabled]="taskStore.isLoading() || !taskStore.canGoNext()"
+      (click)="goToPage(taskStore.page() + 1)">
+      Next
+    </button>
+  </nav>
+
   }
 
 </div>

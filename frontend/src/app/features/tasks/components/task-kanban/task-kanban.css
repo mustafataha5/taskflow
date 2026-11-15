@@ -1,0 +1,49 @@
+
+/* Kanban column drop zone */
+
+.kanban-drop-zone {
+  min-height: 280px;
+}
+
+/* Dragged card preview */
+
+.cdk-drag-preview {
+  box-sizing: border-box;
+  border-radius: 12px;
+  box-shadow:
+    0 16px 32px rgba(0, 0, 0, 0.16);
+}
+
+/* Placeholder during dragging */
+
+.cdk-drag-placeholder {
+  opacity: 0.25;
+}
+
+/* Smooth card movement */
+
+.cdk-drag-animating {
+  transition: transform 180ms ease;
+}
+
+.cdk-drop-list-dragging
+.cdk-drag:not(.cdk-drag-placeholder) {
+  transition: transform 180ms ease;
+}
+
+/* Highlight eligible drop destination */
+
+.cdk-drop-list-receiving {
+  background: rgba(20, 184, 166, 0.07);
+  outline: 2px dashed rgba(20, 184, 166, 0.4);
+  outline-offset: 2px;
+}
+
+/* Accessibility: reduced motion */
+
+@media (prefers-reduced-motion: reduce) {
+  .cdk-drag-animating,
+  .cdk-drop-list-dragging .cdk-drag {
+    transition: none;
+  }
+}
