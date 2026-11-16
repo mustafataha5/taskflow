@@ -17,8 +17,8 @@ import type {
 export class TaskApiService {
 
   private readonly http = inject(HttpClient);
-  private readonly tasksUrl = 'http://localhost:8000/tasks';
-
+  // private readonly tasksUrl = 'http://localhost:8000/tasks';
+  private readonly tasksUrl = '/api/tasks';
   // =========================================
   // 1. GET TASKS (PAGINATED)
   // =========================================
