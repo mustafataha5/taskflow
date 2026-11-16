@@ -49,6 +49,27 @@
 
 > **Scope note:** Task CRUD and Kanban changes use live API data, not mock-only data. The `/tasks/stats` backend endpoint exists, but the README review has not verified whether the frontend statistics cards consume it; confirm from the current code before claiming API-backed statistics. Some secondary navigation entries may remain placeholders.
 
+
+## Screenshots
+
+### Task List View
+
+Manage tasks with filtering, statistics, priority indicators, and quick editing.
+
+![TaskFlow List View](imgs/img1.JPG)
+
+### Kanban Board
+
+Organize tasks by status using drag-and-drop, with changes persisted to the database.
+
+![TaskFlow Kanban Board](imgs/img2.JPG)
+
+### Task Details
+
+View task information, status, priority, due dates, and timestamps.
+
+![TaskFlow Task Details](imgs/img3.JPG)
+
 ## Project Structure
 
 ```text
